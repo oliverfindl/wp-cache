@@ -1,5 +1,6 @@
 # .htaccess file for wp-cache
 
+# Rules for wp-cache
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 	RewriteBase /
