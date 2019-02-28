@@ -1,6 +1,6 @@
 <?php
 	/**
-	 * wp-cache v1.0.0 (2019-02-10)
+	 * wp-cache v1.1.0 (2019-02-28)
 	 * Copyright 2019 Oliver Findl
 	 * @license MIT
 	 */
