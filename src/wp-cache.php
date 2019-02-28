@@ -29,11 +29,8 @@
 	define("SERVER", $_SERVER["SERVER_NAME"]);
 	define("PROTOCOL", $_SERVER["SERVER_PROTOCOL"]);
 	define("METHOD", $_SERVER["REQUEST_METHOD"]);
+	define("IP", $_SERVER["REMOTE_ADDR"]); // you can use more advanced solution if your project requires it, e.g.: https://github.com/zendframework/zend-http/blob/master/src/PhpEnvironment/RemoteAddress.php 
 	define("URL", filter_var("http" . (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === "on" ? "s" : "") . "://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"], FILTER_SANITIZE_URL));
-	define("IP", $_SERVER["REMOTE_ADDR"]);
-
-	define("MD5_URL", md5(URL));
-	define("MD5_IP", md5(IP));
 
 	if(strtoupper(METHOD) !== "GET" || empty(ENABLE_QUOTA) && empty(ENABLE_CACHE)) {
 		require_once(WP_INDEX_PATH);
@@ -58,7 +55,13 @@
 		$cache->addServers(CACHE_SERVERS);
 	}
 
-	if(!empty(QUOTA_ENABLE)) {
+	if(empty(in_array(IP, ["127.0.0.1", "::1"])) && empty(filter_var(IP, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE))) {
+		header(PROTOCOL . " 400 Bad Request");
+		print("[ERROR] Invalid IP!\n");
+		exit(1);
+	}
+
+	if(!empty(QUOTA_ENABLE) && !empty(MD5_IP)) {
 		$quota = intval($cache->get(MD5_IP));
 		if($quota >= QUOTA_LIMIT) {
 			header(PROTOCOL . " 429 Too Many Requests");
@@ -69,11 +72,13 @@
 		$cache->set(MD5_IP, $quota + 1, QUOTA_PERIOD);
 	}
 
-	if(!filter_var(URL, FILTER_VALIDATE_URL)) {
+	if(empty(filter_var(URL, FILTER_VALIDATE_URL))) {
 		header(PROTOCOL . " 400 Bad Request");
 		print("[ERROR] Invalid URL!\n");
 		exit(1);
 	}
+
+	define("MD5_URL", md5(URL));
 
 	if(!empty(CACHE_ENABLE) && !empty(MD5_URL)) {
 		$response = @$cache->get(MD5_URL);
