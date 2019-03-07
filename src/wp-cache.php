@@ -61,6 +61,8 @@
 		exit(1);
 	}
 
+	define("MD5_IP", md5(IP));
+
 	if(!empty(QUOTA_ENABLE) && !empty(MD5_IP)) {
 		$quota = intval($cache->get(MD5_IP));
 		if($quota >= QUOTA_LIMIT) {
