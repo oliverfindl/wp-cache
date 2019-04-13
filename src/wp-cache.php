@@ -57,7 +57,7 @@
 
 	if(empty(in_array(IP, ["127.0.0.1", "::1"])) && empty(filter_var(IP, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE))) {
 		header(PROTOCOL . " 400 Bad Request");
-		print("[ERROR] Invalid IP!\n");
+		print("[ERROR] Invalid IP!" . PHP_EOL);
 		exit(1);
 	}
 
@@ -68,7 +68,7 @@
 		if($quota >= QUOTA_LIMIT) {
 			header(PROTOCOL . " 429 Too Many Requests");
 			header("Retry-After: " . QUOTA_PERIOD);
-			print("[ERROR] Quota limit HIT. Try again after " . QUOTA_PERIOD . " seconds.\n");
+			print("[ERROR] Quota limit HIT. Try again after " . QUOTA_PERIOD . " seconds." . PHP_EOL);
 			exit(1);
 		}
 		$cache->set(MD5_IP, $quota + 1, QUOTA_PERIOD);
@@ -76,7 +76,7 @@
 
 	if(empty(filter_var(URL, FILTER_VALIDATE_URL))) {
 		header(PROTOCOL . " 400 Bad Request");
-		print("[ERROR] Invalid URL!\n");
+		print("[ERROR] Invalid URL!" . PHP_EOL);
 		exit(1);
 	}
 
@@ -113,6 +113,6 @@
 
 	define("SCRIPT_END_TIME", microtime(true));
 
-	print("\n<!-- wp-cache: page generated in " . round(SCRIPT_END_TIME - SCRIPT_START_TIME, 4) . " seconds -->\n");
+	print(PHP_EOL . "<!-- wp-cache: page generated in " . round(SCRIPT_END_TIME - SCRIPT_START_TIME, 4) . " seconds -->" . PHP_EOL);
 	exit(0);
 ?>
